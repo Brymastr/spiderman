@@ -3,39 +3,43 @@ const
   request = require('request')
   async = require('async');
 
-exports.crawl = (start, cb) => {
-  console.log(`crawl starting at ${start}`);
+var urlList = []; // in-memory method for performance. Requires significantly more ram.
 
-  let sites = 0;
+exports.crawl = done => {
 
-  // Start fresh each time
-  Site.remove({}, () => {
-    let parent = new Site({
-      url: start
-    }).save((err, doc) => {
-      get(start, body => {
-        let sites = read(body, doc._id);
-        async.each(sites, saveSite, err => {
-          console.log(`crawl complete. ${sites.length} sites crawled.`);
-          cb();          
-        });
+  Site.findOne({traversed: false}, (err, site) => {
+
+    if(!site || err)
+      done('Error? Or maybe it\'s just done!');
+
+    get(site.url, body => {
+      let sites = read(body, site._id);
+      async.each(sites, saveSite, err => {
+        // console.log(`crawl complete. ${sites.length} sites crawled.`);
+        site.traversed = true;
+        site.save(() => this.crawl(() => done('Done')));
       });
     });
-  });
 
+  });
 };
 
 // Get all <a href=""> out of html
 const read = (html, parentId) => {
-  let links = html.match(/href(\s)*=(\s)*"http[^"']*"/g).map(x => x.split('"')[1]);
   let objs = [];
-  links.forEach(link => {
-    objs.push(new Site({
-      url: link,
-      parents: [parentId]
-    }));
-  });
-  return objs;
+  try {
+    let links = html.match(/href\s*=\s*"http[^"']*"/ig).map(x => x.split('"')[1]);
+    links.forEach(link => {
+      objs.push(new Site({
+        url: link,
+        parents: [parentId]
+      }));
+    });
+  } catch(err) {
+    // No links on that page
+  } finally {
+    return objs;
+  }
 };
 
 // download html for a url
@@ -45,8 +49,19 @@ const get = (url, cb) => {
   });
 };
 
-const saveSite = (url, done) => {
-  new Site({
-    url: url,
-  }).save(() => done());
+const saveSite = (site, done) => {
+
+  Site.findOne({url: site.url}, (err, result) => {
+    if(!result) site.save(() => done());
+    else done();
+  });
+
+  // if(urlList.indexOf(site.url) != -1)
+  //   site.save(() => done());
+  // else
+  //   done();
+};
+
+exports.report = done => {
+  
 };

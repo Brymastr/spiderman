@@ -7,3 +7,5 @@ save parent site id to child sites
 build a frontend for visualizing the connections
 
 filter out sites internal links
+
+only create new site objects if that exact url doesn't already exist (efficiency)
