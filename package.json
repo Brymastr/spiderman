@@ -1,0 +1,30 @@
+{
+  "name": "spiderman",
+  "version": "0.0.1",
+  "description": "a web crawler because why not?",
+  "main": "index.js",
+  "dependencies": {
+    "async": "^2.1.2",
+    "mongoose": "^4.6.8",
+    "request": "^2.79.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "nope",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Brymastr/spiderman.git"
+  },
+  "keywords": [
+    "web",
+    "crawler"
+  ],
+  "author": "Brycen Dorsay",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Brymastr/spiderman/issues"
+  },
+  "homepage": "https://github.com/Brymastr/spiderman#readme"
+}

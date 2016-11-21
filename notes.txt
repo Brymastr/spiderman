@@ -1,0 +1,9 @@
+Give starting url
+create 'Site' object in db
+for each <a> on that site add a new 'Site' to the db
+save number of child links to the top parent site
+save parent site id to child sites
+
+build a frontend for visualizing the connections
+
+filter out sites internal links
