@@ -14,9 +14,10 @@ module.exports = mongoose.model('Site', Schema({
   traversed: {type: Boolean, default: false}
 }).pre('save', function(next) {
   
-  console.log(this.url.full);  
+  console.log(this.url.full);
   this.url.protocol = this.url.full.match(/(https?)/i)[0];
-  this.url.domain = this.url.full.match(/(?::\/\/)([a-z0-9.:?\-%_=&; ]+)($|\/)/i)[1];
+  let domain = this.url.full.match(/(?::\/\/)([a-z0-9.:?\-@%_=&; ]+)($|\/)/i);
+  if(domain) this.url.domain = domain[1]
   let path = this.url.full.match(/(?:\.\w*)(\/.*)/i);
   if(path) this.url.path = path[1];
   else this.url.path = '';

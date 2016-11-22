@@ -51,7 +51,10 @@ const get = (url, cb) => {
 const saveSite = (site, done) => {
   Site.findOne({'url.full': site.url.full}, (err, result) => {
     if(!result) site.save(() => done());
-    else done();
+    else {
+      result.parents.push(site.parents[site.parents.length - 1]);
+      result.save(() => done());
+    }
   });
 
   // This would be faster
@@ -70,7 +73,7 @@ exports.report = done => {
     });
 
     console.log(`Sites crawled: ${sites.length}`);
-    console.log(`Unique domains: ${distinctDomains.length}`)
+    console.log(`Unique domains: ${distinctDomains.length}`);
 
     done();
   })
