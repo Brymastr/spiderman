@@ -6,13 +6,12 @@ const
 var urlList = []; // in-memory method for performance. Requires significantly more ram.
 
 exports.crawl = done => {
-
   Site.findOne({traversed: false}, (err, site) => {
 
     if(!site || err)
       done('Error? Or maybe it\'s just done!');
 
-    get(site.url, body => {
+    get(site.url.full, body => {
       let sites = read(body, site._id);
       async.each(sites, saveSite, err => {
         // console.log(`crawl complete. ${sites.length} sites crawled.`);
@@ -31,7 +30,7 @@ const read = (html, parentId) => {
     let links = html.match(/href\s*=\s*"http[^"']*"/ig).map(x => x.split('"')[1]);
     links.forEach(link => {
       objs.push(new Site({
-        url: link,
+        'url.full': link,
         parents: [parentId]
       }));
     });
@@ -50,12 +49,12 @@ const get = (url, cb) => {
 };
 
 const saveSite = (site, done) => {
-
-  Site.findOne({url: site.url}, (err, result) => {
+  Site.findOne({'url.full': site.url.full}, (err, result) => {
     if(!result) site.save(() => done());
     else done();
   });
 
+  // This would be faster
   // if(urlList.indexOf(site.url) != -1)
   //   site.save(() => done());
   // else
@@ -63,5 +62,16 @@ const saveSite = (site, done) => {
 };
 
 exports.report = done => {
-  
+  Site.find({}, (err, sites) => {
+    let distinctDomains = [];
+    sites.forEach(site => {
+      if(distinctDomains.indexOf(site.url.domain) == -1)
+        distinctDomains.push(site.url.domain);
+    });
+
+    console.log(`Sites crawled: ${sites.length}`);
+    console.log(`Unique domains: ${distinctDomains.length}`)
+
+    done();
+  })
 };

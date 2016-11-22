@@ -11,7 +11,8 @@
   "devDependencies": {},
   "scripts": {
     "test": "nope",
-    "start": "node index.js"
+    "start": "node index.js",
+    "report": "node index.js report"
   },
   "repository": {
     "type": "git",
